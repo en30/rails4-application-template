@@ -1,0 +1,5 @@
+load 'deploy'
+load 'config/deploy'
+<% if @use_sidekiq %>
+require 'capistrano/sidekiq'
+<% end %>

@@ -1,0 +1,15 @@
+<source>
+ type tail
+ format ltsv
+ path <%= current_path %>/log/<%= rails_env %>.log
+ pos_file <%= current_path %>/log/<%= rails_env %>.log.pos
+ tag <%= application %>.access
+</source>
+
+<source>
+ type tail
+ format ltsv
+ path <%= current_path %>/log/sql.log
+ pos_file <%= current_path %>/log/sql.log.pos
+ tag <%= application %>.database
+</source>

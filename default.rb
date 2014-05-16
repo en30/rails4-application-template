@@ -206,4 +206,12 @@ if yes? 'Use mail?'
   CONFIG
 end
 
+# Capistrano
+after_bundle_install do
+  template 'Capfile.tt'
+  template 'config/deploy.rb.tt'
+  directory 'config/deploy'
+end
+@use_sidekiq = yes?('Use sidekiq?')
+
 bundle_install

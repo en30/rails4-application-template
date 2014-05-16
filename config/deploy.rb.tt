@@ -1,0 +1,57 @@
+load File.expand_path('../deploy/utilities.rb', __FILE__)
+Dir.glob(File.expand_path('../deploy/recipes/**/*.rb', __FILE__)).each{|f| load f }
+set :assets_role, [:web, :app]
+load 'deploy/assets'
+
+set :application, "<%= @app_name %>"
+set :user, ''
+set :use_sudo, false
+set :host, Settings.host
+
+require 'bundler/capistrano'
+set :bundle_flags, "--no-deployment --without test development"
+
+set :ssh_options, { auth_methods: ['publickey'], forward_agent: true }
+# TODO:
+set :repository, ''
+set :scm, :git
+set :branch, "master"
+set :deploy_via, :remote_cache
+
+set :keep_release, 3
+
+require 'capistrano/ext/multistage'
+
+after "deploy:update", "deploy:cleanup"
+
+set :normalize_asset_timestamps, false
+
+set(:unicorn_pid){ "#{shared_path}/pids/unicorn.pid" }
+
+before 'deploy:start', 'unicorn:config'
+before 'deploy:restart', 'unicorn:config'
+
+after 'bundle:install', 'db:create'
+after 'db:create', 'deploy:migrate'
+
+before 'bundle:install', 'bundle:setuppg'
+
+after 'deploy:setup', 'nginx:setup'
+after 'depoy:cold', 'nginx:restart'
+
+<% if @use_sidekiq %>
+set(:sidekiq_pid){ "#{shared_path}/pids/sidekiq.pid" }
+after 'sidekiq:start', 'sidekiq:monit'
+<% end %>
+
+after 'fluentd:setup', 'fluentd:nginx_setup'
+after 'fluentd:nginx_setup', 'fluentd:restart'
+
+after 'deploy', 'monit:restart'
+
+# TODO:
+## hipchat
+require 'hipchat/capistrano'
+set :hipchat_token, ''
+set :hipchat_room_name, ''
+set :hipchat_announce, true

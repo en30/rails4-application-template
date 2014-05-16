@@ -1,0 +1,15 @@
+<source>
+ type tail
+ format ltsv
+ path <%= current_path %>/log/<%= rails_env %>.log
+ pos_file /var/log/td-agent/<%= application %>.log.pos
+ tag forward.<%= application %>.app
+</source>
+
+<source>
+ type tail
+ format ltsv
+ path <%= current_path %>/log/sql.log
+ pos_file /var/log/td-agent/<%= application %>_sql.log.pos
+ tag forward.<%= application %>.sql
+</source>

@@ -1,0 +1,8 @@
+check process <%= application %> with pidfile <%= unicorn_pid %>
+  group <%= application %>
+  start program = "/bin/su - <%= user %> -c 'cd <%= current_path %>;touch <%= shared_path %>/log/unicorn.log; bundle exec unicorn_rails -c config/unicorn.rb -E <%= rails_env %> -D'"
+  stop program = "/bin/su - <%= user %> -c 'kill -s TERM `cat <%= unicorn_pid %>`"
+  if cpu usage > 95% for 3 cycles
+    then exec "/bin/su - <%= user %> -c 'kill -s USR2 `cat <%= unicorn_pid %>`"
+  if failed host localhost port 8080 protocol http
+    then alert

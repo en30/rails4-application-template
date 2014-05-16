@@ -1,0 +1,8 @@
+<source>
+ type tail
+ format ltsv
+ time_format %d/%b/%Y:%H:%M:%S %z
+ path /var/log/nginx/<%= host %>.access.log
+ pos_file /var/log/td-agent/<%= application %>.nginx.pos
+ tag forward.nginx.<%= application %>.access
+</source>
