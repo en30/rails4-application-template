@@ -129,4 +129,52 @@ after_bundle_install do
   copy_file 'Guardfile'
 end
 
+# welcom page作成
+after_bundle_install do
+  generate :controller, 'welcome', 'index'
+  route "root to: 'welcome#index'"
+end
+
+# devise
+after_bundle_install do
+  generate 'devise:install'
+  generate 'devise', 'User'
+  run 'curl https://raw.githubusercontent.com/tigrish/devise-i18n/master/locales/ja.yml -o config/locales/devise.ja.yml'
+end
+
+if yes? 'Use twitter?'
+  gem 'omniauth-twitter'
+  gem 'twitter', '~>5.0'
+  copy_file 'app/models/client.rb'
+
+  after_bundle_install do
+    generate :migration, 'AddOmniauthColumnsToUsers', 'twitter_id:bigint', 'access_token:string', 'access_token_secret:string'
+    p 'Write columns you need to the generated migration file'
+    insert_into_file 'config/initializers/devise.rb', "\nconfig.omniauth :twitter, Settings.twitter.consumer_key, Settings.twitter.consumer_secret\n", before: "\nend"
+
+    insert_into_file 'config/routes.rb', ", controllers: {omniauth_callbackes: 'users/omniauth_callbacks'}", after: 'devise_for :users'
+    copy_file 'app/controllers/users/omniauth_callbacks_controller.rb'
+    inject_into_file 'app/models/user.rb', <<-CODE, before: "\nend"
+
+      devise :omniauthable, omniauth_providers: [:twitter]
+      def self.find_for_twitter_oauth(auth, sign_in_resource=nil)
+        user = sign_in_resource || User.find_or_initialize_by(twitter_id: auth.uid)
+        user_info = auth.extra.raw_info
+        raise user_info.errors[0].message if user_info.errors
+
+        user.update!({
+          twitter_id: auth.uid,
+          access_token: auth.credentials.token,
+          access_token_secret: auth.credentials.secret,
+          #        name: user_info.name,
+          #        description: user_info.description,
+          #        twitter_screen_name: user_info.screen_name,
+          #        profile_image_url: user_info.profile_image_url
+        })
+        user
+      end
+    CODE
+  end
+end
+
 bundle_install
