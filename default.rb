@@ -177,4 +177,15 @@ if yes? 'Use twitter?'
   end
 end
 
+
+if yes? 'User twitter-bootstrap?'
+  gem 'therubyracer'
+  gem 'less-rails'
+  gem 'twitter-bootstrap-rails', git: 'git://github.com/seyhunak/twitter-bootstrap-rails.git', branch: 'bootstrap3'
+  after_bundle_install do
+    generate 'bootstrap:install', 'less'
+  end
+  insert_into_file 'app/assets/stylesheets/application.css', "\n *= require bootstrap_and_overrides", before: "\n *= require_self"
+end
+
 bundle_install
