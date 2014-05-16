@@ -17,6 +17,8 @@ production:
   <<: *defaults
   host: ''
   exception_recipient: ''
-  ssh:
-    user: ''
-    port: ''
+
+staging:
+  <<: *defaults
+  host: ''
+  exception_recipient: ''

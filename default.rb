@@ -212,6 +212,18 @@ after_bundle_install do
   template 'config/deploy.rb.tt'
   directory 'config/deploy'
 end
-@use_sidekiq = yes?('Use sidekiq?')
+
+if @use_sidekiq = yes?('Use sidekiq?')
+  gem 'sidekiq'
+  gem 'capistrano-sidekiq', group: :development
+  template 'config/initializer/sidekiq.rb.tt'
+  copy_file 'config/sidekiq.yml'
+  insert_into_file 'config/constants.yml', <<-YML, before: "\ndevelopment"
+  redis:
+    host: 'localhost'
+    port: '6379'
+    db: '0'
+  YML
+end
 
 bundle_install

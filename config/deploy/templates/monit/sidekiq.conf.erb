@@ -2,4 +2,3 @@ check process <%= application %>_sidekiq with pidfile <%= sidekiq_pid %>
   group <%= application %>
   start program = "/bin/su - <%= user %> -c 'cd <%= current_path %>; nohup bundle exec sidekiq -e <%= rails_env %> -C <%= current_path %>/config/sidekiq.yml -i 0 -P <%= sidekiq_pid %> >> <%= shared_path %>/log/sidekiq.log 2>&1 &'"
   stop program = "/bin/kill -0 `cat <%= sidekiq_pid %>`> /dev/null 2>&1"
-  noalert uumu_donna_address_ga_iikana@yahoo.co.jp
