@@ -81,7 +81,7 @@ gem 'settingslogic'
 copy_file 'app/models/settings.rb'
 copy_file 'config/constants.yml'
 
-# default configuration
+# default configurations
 application <<-CONFIG
 config.time_zone = 'Tokyo'
 config.encoding = 'utf-8'
@@ -97,12 +97,12 @@ CONFIG
 environment <<-CONFIG, env: 'production'
 config.action_mailer.delivery_method = :smtp
 config.action_mailer.perform_deliveries = true
-config.action_mailer.default_url_options = { :host => '\#{Settings.host}' }
+config.action_mailer.default_url_options = { host: Settings.host }
 config.middleware.use ExceptionNotification::Rack,
 email: {
   email_prefix: '[#{@app_name}]',
   sender_address: %w{"notifier" <notifier@\#{Settings.host}>},
-  exception_recipients: %w{\#{Settings.exception_recipient}}
+  exception_recipients: [Settings.exception_recipient]
 }
 CONFIG
 
@@ -112,7 +112,7 @@ run "cp config/environments/production.rb config/environments/staging.rb"
 append_to_file 'config/database.yml', <<-YML
 staging:
   adapter: postgresql
-  database: #{@app_name.gsub('_', '-')}
+  database: #{@app_name}
   username:
   password:
   encoding: utf8
@@ -121,5 +121,12 @@ staging:
   host:
   port: 5432
 YML
+
+# Rspec
+after_bundle_install do
+  generate 'rspec:install'
+  directory 'spec'
+  copy_file 'Guardfile'
+end
 
 bundle_install
