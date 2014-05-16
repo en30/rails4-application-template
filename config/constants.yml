@@ -1,0 +1,22 @@
+defaults: &defaults
+  twitter:
+    consumer_key: ''
+    consumer_secret: ''
+    access_token: ''
+    access_token_secret: ''
+
+development:
+  <<: *defaults
+  host: ''
+
+test:
+  <<: *defaults
+  host: ''
+
+production:
+  <<: *defaults
+  host: ''
+  exception_recipient: ''
+  ssh:
+    user: ''
+    port: ''

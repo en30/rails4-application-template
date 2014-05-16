@@ -76,4 +76,9 @@ gem_group :production do
   gem 'newrelic_rpm'
 end
 
+# Settingslogic
+gem 'settingslogic'
+copy_file 'app/models/settings.rb'
+copy_file 'config/constants.yml'
+
 bundle_install
