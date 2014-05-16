@@ -177,7 +177,6 @@ if yes? 'Use twitter?'
   end
 end
 
-
 if yes? 'User twitter-bootstrap?'
   gem 'therubyracer'
   gem 'less-rails'
@@ -186,6 +185,25 @@ if yes? 'User twitter-bootstrap?'
     generate 'bootstrap:install', 'less'
   end
   insert_into_file 'app/assets/stylesheets/application.css', "\n *= require bootstrap_and_overrides", before: "\n *= require_self"
+end
+
+if yes? 'Use mail?'
+  gem 'premailer-rails'
+  gem 'nokogiri'
+
+  gem_group :development do
+    gem 'letter_opener'
+  end
+
+  gsub_file 'config/environments/development.rb', /(config.action_mailer.raise_delivery_errors = )false/, '\1true'
+  environment 'config.action_mailer.delivery_method = :letter_opener', env: 'development'
+  application <<-CONFIG
+  config.after_initialize do
+    config.action_mailer.default_options = {
+      from: "do_not_reply@\#{Settings.host}"
+    }
+  end
+  CONFIG
 end
 
 bundle_install
